@@ -40,3 +40,27 @@ async def create_message(
         raise NoResponseError()
 
     return context.response
+
+
+@router.post("/chat/completions", response_model=None)
+@retry(
+    retry=retry_if_exception(is_retryable_error),
+    stop=stop_after_attempt(settings.retry_attempts),
+    wait=wait_fixed(settings.retry_interval),
+    before_sleep=log_before_sleep,
+    reraise=True,
+)
+async def completion(
+    request: Request, messages_request: MessagesAPIRequest, _: AuthDep
+) -> StreamingResponse | JSONResponse:
+    context = ClaudeAIContext(
+        original_request=request,
+        messages_api_request=messages_request,
+    )
+
+    context = await ClaudeAIPipeline().process(context)
+
+    if not context.response:
+        raise NoResponseError()
+
+    return context.response
