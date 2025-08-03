@@ -10,7 +10,7 @@ from tenacity import (
 from app.core.config import settings
 from app.core.exceptions import NoResponseError
 from app.dependencies.auth import AuthDep
-from app.models.claude import MessagesAPIRequest
+from app.models.claude import MessagesAPIRequest, ThinkingOptions
 from app.processors.claude_ai import ClaudeAIContext
 from app.processors.claude_ai.pipeline import ClaudeAIPipeline
 from app.utils.retry import is_retryable_error, log_before_sleep
@@ -33,6 +33,9 @@ async def create_message(
         original_request=request,
         messages_api_request=messages_request,
     )
+    if messages_request.thinking:
+        if messages_request.thinking.type == "enabled":
+            messages_request.temperature = 1
 
     context = await ClaudeAIPipeline().process(context)
 

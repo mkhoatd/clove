@@ -211,3 +211,4 @@ __marimo__/
 
 # Built frontend static files
 app/static/
+.idea
