@@ -49,5 +49,5 @@ ENV WORKERS=${WORKERS:-4}
 # Expose port
 EXPOSE ${PORT:-5201}
 
-# Run the application
-CMD ["python", "-m", "app.main"]
+# Run the application with uvicorn and multiple workers
+CMD ["sh", "-c", "uvicorn app.main:app --host ${HOST} --port ${PORT} --workers ${WORKERS}"]
