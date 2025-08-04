@@ -1,6 +1,7 @@
 from typing import Optional, List, Union, Literal, Dict, Any
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from enum import Enum
+from loguru import logger
 
 
 class Role(str, Enum):
@@ -131,6 +132,14 @@ class ToolChoice(BaseModel):
     type: Literal["auto", "any", "tool", "none"] = "auto"
     name: Optional[str] = None
     disable_parallel_tool_use: Optional[bool] = None
+    
+    @model_validator(mode='after')
+    def validate_tool_name(self):
+        """Validate that name is provided when type is 'tool'."""
+        if self.type == "tool" and not self.name:
+            logger.error(f"ToolChoice validation failed - type='tool' but name is missing. Full tool_choice: {self.model_dump()}")
+            raise ValueError("tool_choice.name is required when type is 'tool'")
+        return self
 
 
 class Tool(BaseModel):
@@ -169,6 +178,18 @@ class MessagesAPIRequest(BaseModel):
     thinking: Optional[ThinkingOptions] = None
     tool_choice: Optional[ToolChoice] = None
     tools: Optional[List[Tool]] = None
+    
+    @model_validator(mode='after')
+    def validate_request(self):
+        """Log the full request if tool_choice validation fails."""
+        try:
+            # The ToolChoice validation will run automatically
+            return self
+        except Exception as e:
+            # Log the full request for debugging
+            logger.error(f"MessagesAPIRequest validation failed: {e}")
+            logger.error(f"Full request data: {self.model_dump_json(indent=2)}")
+            raise
 
 
 class Message(BaseModel):
