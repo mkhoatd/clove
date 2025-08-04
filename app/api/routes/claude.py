@@ -10,7 +10,8 @@ from tenacity import (
 from app.core.config import settings
 from app.core.exceptions import NoResponseError
 from app.dependencies.auth import AuthDep
-from app.models.claude import MessagesAPIRequest, ThinkingOptions
+from app.models.claude import MessagesAPIRequest
+from loguru import logger
 from app.processors.claude_ai import ClaudeAIContext
 from app.processors.claude_ai.pipeline import ClaudeAIPipeline
 from app.utils.retry import is_retryable_error, log_before_sleep
@@ -38,6 +39,7 @@ async def create_message(
             messages_request.temperature = 1
     if messages_request.tool_choice:
         if messages_request.tool_choice.type == "tool" and (messages_request.tool_choice.name is None or messages_request.tool_choice.name == ""):
+            logger.error(f"Full request data: {messages_request.model_dump_json(indent=2)}")
             messages_request.tool_choice = None
 
     context = await ClaudeAIPipeline().process(context)

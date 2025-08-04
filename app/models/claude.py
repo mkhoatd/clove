@@ -132,13 +132,13 @@ class ToolChoice(BaseModel):
     name: Optional[str] = None
     disable_parallel_tool_use: Optional[bool] = None
     
-    @model_validator(mode='after')
-    def validate_tool_name(self):
-        """Validate that name is provided when type is 'tool'."""
-        if self.type == "tool" and not self.name:
-            logger.error(f"ToolChoice validation failed - type='tool' but name is missing. Full tool_choice: {self.model_dump()}")
-            raise ValueError("tool_choice.name is required when type is 'tool'")
-        return self
+    # @model_validator(mode='after')
+    # def validate_tool_name(self):
+    #     """Validate that name is provided when type is 'tool'."""
+    #     if self.type == "tool" and not self.name:
+    #         logger.error(f"ToolChoice validation failed - type='tool' but name is missing. Full tool_choice: {self.model_dump()}")
+    #         raise ValueError("tool_choice.name is required when type is 'tool'")
+    #     return self
 
 
 class Tool(BaseModel):
@@ -178,16 +178,16 @@ class MessagesAPIRequest(BaseModel):
     tool_choice: Optional[ToolChoice] = None
     tools: Optional[List[Tool]] = None
     
-    @model_validator(mode='after')
-    def validate_request(self):
-        """Log the full request if tool_choice validation fails."""
-        # Check if tool_choice validation would fail
-        if self.tool_choice and self.tool_choice.type == "tool" and not self.tool_choice.name:
-            # Log the full request for debugging
-            logger.error("ToolChoice validation error: type='tool' but name is missing")
-            logger.error(f"Full request data: {self.model_dump_json(indent=2)}")
-            # Let the ToolChoice validator handle the actual error
-        return self
+    # @model_validator(mode='after')
+    # def validate_request(self):
+    #     """Log the full request if tool_choice validation fails."""
+    #     # Check if tool_choice validation would fail
+    #     if self.tool_choice and self.tool_choice.type == "tool" and not self.tool_choice.name:
+    #         # Log the full request for debugging
+    #         logger.error("ToolChoice validation error: type='tool' but name is missing")
+    #         logger.error(f"Full request data: {self.model_dump_json(indent=2)}")
+    #         # Let the ToolChoice validator handle the actual error
+    #     return self
 
 
 class Message(BaseModel):
