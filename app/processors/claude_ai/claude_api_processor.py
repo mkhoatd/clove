@@ -89,6 +89,14 @@ class ClaudeAPIProcessor(BaseProcessor):
                 )
 
             with account:
+                if (context.messages_api_request.tool_choice and context.messages_api_request.tool_choice.type == "tool" and not context.messages_api_request.tool_choice.name):
+                    logger.warning("Fixing invalid tool_choice: type 'tool' but name is null/empty. Changing to type='any'")
+                    context.messages_api_request.tool_choice.type = "any"
+                
+                if context.messages_api_request.thinking:
+                    if context.messages_api_request.thinking.type == "enabled":
+                        context.messages_api_request.temperature = 1
+
                 request_json = context.messages_api_request.model_dump_json(
                     exclude_none=True
                 )
