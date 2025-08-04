@@ -36,6 +36,9 @@ async def create_message(
     if messages_request.thinking:
         if messages_request.thinking.type == "enabled":
             messages_request.temperature = 1
+    if messages_request.tool_choice:
+        if messages_request.tool_choice.type == "tool" and (messages_request.tool_choice.name is None or messages_request.tool_choice.name == ""):
+            messages_request.tool_choice = None
 
     context = await ClaudeAIPipeline().process(context)
 

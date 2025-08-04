@@ -126,7 +126,6 @@ class ThinkingOptions(BaseModel):
     type: Literal["enabled", "disabled"] = "disabled"
     budget_tokens: Optional[int] = None
 
-
 class ToolChoice(BaseModel):
     model_config = ConfigDict(extra="allow")
     type: Literal["auto", "any", "tool", "none"] = "auto"
@@ -182,14 +181,13 @@ class MessagesAPIRequest(BaseModel):
     @model_validator(mode='after')
     def validate_request(self):
         """Log the full request if tool_choice validation fails."""
-        try:
-            # The ToolChoice validation will run automatically
-            return self
-        except Exception as e:
+        # Check if tool_choice validation would fail
+        if self.tool_choice and self.tool_choice.type == "tool" and not self.tool_choice.name:
             # Log the full request for debugging
-            logger.error(f"MessagesAPIRequest validation failed: {e}")
+            logger.error("ToolChoice validation error: type='tool' but name is missing")
             logger.error(f"Full request data: {self.model_dump_json(indent=2)}")
-            raise
+            # Let the ToolChoice validator handle the actual error
+        return self
 
 
 class Message(BaseModel):
