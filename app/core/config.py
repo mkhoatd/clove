@@ -254,7 +254,7 @@ class Settings(BaseSettings):
 
     # Claude API Specific
     max_models: List[str] | str = Field(
-        default=["claude-opus-4-20250514"],
+        default=["claude-opus-4-1-20250805"],
         env="MAX_MODELS",
         description="Comma-separated list of models that require max plan accounts",
     )

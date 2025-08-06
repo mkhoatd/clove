@@ -27,6 +27,12 @@ class ModelList(BaseModel):
 # Define the available models
 AVAILABLE_MODELS = [
     Model(
+        id="claude-opus-4-1-20250805",
+        display_name="Claude Opus 4.1",
+        created_at="2025-08-05T00:00:00Z",
+        created=1722873600,  # Unix timestamp for 2025-08-05
+    ),
+    Model(
         id="claude-opus-4-20250514",
         display_name="Claude Opus 4",
         created_at="2025-05-22T00:00:00Z",
